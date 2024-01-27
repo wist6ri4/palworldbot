@@ -28,16 +28,16 @@ module.exports = {
         try{
             const { StartingInstances } = await ec2.send(command);
             const instanceIdList = StartingInstances.map(
-                (instance) => '・ ${instance.InstanceId}',
+                (instance) => `・${instance.InstanceId}`,
             );
             console.log("Starting Instances:");
             console.log(instanceIdList.join("\n"));
-            interaction.channel.send(`${USHIDA_ID}\nInstance started!`);
+            interaction.reply(`${USHIDA_ID}\nInstance started!`);
         } catch(err) {
             console.log('Failed to start Instance：')
             console.log(err);
             console.log(err.stack);
-            interaction.channel.send('Failed to start Instance：\n' +  err);
+            interaction.reply('Failed to start Instance：\n' +  err);
         };
     },
 };

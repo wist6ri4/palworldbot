@@ -54,9 +54,9 @@ client.on(Events.InteractionCreate, async interaction => {
         } catch(error) {
             console.error(error);
             if(interaction.replied || interaction.deferred) {
-                await interaction.followUp({ content: 'コマンド実行時にエラーが発生しました。' + error, ephemeral: true });
+                await interaction.followUp({ content: 'コマンド実行時にエラーが発生しました。' + error, ephemeral: false });
             } else {
-                await interaction.reply({ content: 'コマンド実行時にエラーが発生しました。' + error, ephemeral: true });
+                await interaction.reply({ content: 'コマンド実行時にエラーが発生しました。' + error, ephemeral: false });
             }
         }
     } else {

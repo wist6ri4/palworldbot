@@ -6,7 +6,7 @@ const params = {
 // SlashCommandBuilder、Clientの読み込み
 const { SlashCommandBuilder } = require('discord.js');
 // aws-sdkの読み込み
-const { EC2Client, StartInstancesCommand } = require('@aws-sdk/client-ec2')
+const { EC2Client, StopInstancesCommand } = require('@aws-sdk/client-ec2')
 const ec2 = new EC2Client({
     region: REGION,
     credentials: {
@@ -28,16 +28,16 @@ module.exports = {
         try{
             const { StoppingInstances } = await ec2.send(command);
             const instanceIdList = StoppingInstances.map(
-                (instance) => '・ ${instance.InstanceId}',
+                (instance) => `・${instance.InstanceId}`,
             );
             console.log("Stopping Instances:");
             console.log(instanceIdList.join("\n"));
-            interaction.channel.send(`${USHIDA_ID}\nInstance stopped!`);
+            interaction.reply(`${USHIDA_ID}\nInstance stopped!`);
         } catch(err) {
             console.log('Failed to stop Instance：')
             console.log(err);
             console.log(err.stack);
-            interaction.channel.send('Failed to stop Instance：\n' +  err);
+            interaction.reply('Failed to stop Instance：\n' +  err);
         };
     },
 };
