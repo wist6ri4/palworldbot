@@ -13,7 +13,6 @@ const client = new Client({
         GatewayIntentBits.GuildMessages
     ] 
 });
-require('dotenv').config();
 
 
 // コマンドファイルを取得して保持
