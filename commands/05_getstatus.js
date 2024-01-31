@@ -6,7 +6,7 @@ const params = {
 // SlashCommandBuilder、Clientの読み込み
 const { SlashCommandBuilder } = require('discord.js');
 // aws-sdkの読み込み
-const { EC2Client, DescribeInstancesCommand } = require('@aws-sdk/client-ec2')
+const { EC2Client, DescribeInstanceStatusCommand } = require('@aws-sdk/client-ec2')
 const ec2 = new EC2Client({
     region: REGION,
     credentials: {
@@ -24,28 +24,29 @@ module.exports = {
         .setDescription('Palworldのサーバーの状態を確認します'),
     execute: async function(interaction) {
         try{
-            const d = new Date();
-            const year = d.getFullYear();
-            const month = `0${d.getMonth() + 1}`.slice(-2);
-            const launchTimePattern = `${year}-${month}-*`;
-            const command = new DescribeInstancesCommand({
-                Filters: [
-                    { Name: 'architecture', Values: ['x86_64'] },
-                    { Name: 'instance-state-name', Values: ['running'] },
-                    {
-                        Name: 'launch-time',
-                        Values: [launchTimePattern],
-                    },
-                ],
-            });
+            const command = new DescribeInstanceStatusCommand(params);
+            const response = await ec2.send(command);
 
-            const { Reservations } = await ec2.send(command);
-            const instanceList = Reservations.reduce((prev, current) => {
-                return prev.concat(current.Instances);
-            }, []);
             console.log("Getting state:");
-            console.log(instanceList.join("\n"));
-            interaction.reply({ content: 'Instance Status:' + instanceList, ephemeral: true });
+            console.log(response);
+            if(response.InstanceStatuses.length > 0) {
+                const instance = response.InstanceStatuses[0];
+                interaction.reply({
+                    content:
+                        '[Instance Status]\n'
+                        + 'State: Running\n'
+                        + 'InstanceId: ' + (instance.InstanceId.slice(0, 10) + '\*\*\*\*\*\*\*\*\*\*') + '\n'
+                        + 'Availability Zone: ' + instance.AvailabilityZone + '\n',
+                    ephemeral: true,
+                });
+            } else {
+                interaction.reply({
+                    content:
+                        '[Instance Status]\n'
+                        + 'State: Stopped',
+                    ephemeral: true, 
+                });
+            };
         } catch(err) {
             console.log('Failed to get status：')
             console.log(err);
